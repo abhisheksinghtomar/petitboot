@@ -569,6 +569,7 @@ struct boot_task *boot(void *ctx, struct discover_boot_option *opt,
 	int rc;
 	int lockdown_type;
 
+	printf("FUNC %s : ABHISHEK START\n",__func__);
 	if (opt && opt->option->name)
 		boot_desc = opt->option->name;
 	else if (cmd && cmd->boot_image_file)
@@ -585,8 +586,10 @@ struct boot_task *boot(void *ctx, struct discover_boot_option *opt,
 	boot_task->status_arg = status_arg;
 
 	if (cmd && cmd->boot_image_file) {
+		printf("FUNC %s : ABHISHEK in non-autoboot | BOOT IMAGE :%s\n",__func__ , cmd->boot_image_file);
 		image = pb_url_parse(boot_task, cmd->boot_image_file);
 	} else if (opt && opt->boot_image) {
+		printf("FUNC %s : ABHISHEK in autoboot | BOOT IMAGE :%s\n", __func__, opt->boot_image->url->full);
 		image = opt->boot_image->url;
 	} else {
 		pb_log_fn("no image specified\n");
@@ -595,12 +598,16 @@ struct boot_task *boot(void *ctx, struct discover_boot_option *opt,
 		talloc_free(boot_task);
 		return NULL;
 	}
+	printf("FUNC %s : ABHISHEK | FINAL BOOT IMAGE :%s\n", __func__, image->full);
 
 	if (cmd && cmd->initrd_file) {
 		initrd = pb_url_parse(boot_task, cmd->initrd_file);
+		printf("FUNC %s : ABHISHEK in non-autoboot | BOOT IMAGE :%s\n", __func__, cmd->initrd_file);
 	} else if (opt && opt->initrd) {
 		initrd = opt->initrd->url;
+		printf("FUNC %s : ABHISHEK in autoboot | INITRD :%s\n", __func__, opt->initrd->url->full);
 	}
+	printf("FUNC %s : ABHISHEK | FINAL INITRD:%s\n",__func__, initrd->full);
 
 	if (cmd && cmd->dtb_file) {
 		dtb = pb_url_parse(boot_task, cmd->dtb_file);
@@ -620,13 +627,17 @@ struct boot_task *boot(void *ctx, struct discover_boot_option *opt,
 	boot_task->decrypt_files = (lockdown_type == PB_LOCKDOWN_DECRYPT);
 
 	if (cmd && cmd->boot_args) {
+		printf("FUNC %s : ABHISHEK in non-autoboot| BOOt args :%s\n", __func__, cmd->boot_args);
 		boot_task->args = talloc_strdup(boot_task, cmd->boot_args);
+
 	} else if (opt && opt->option->boot_args) {
 		boot_task->args = talloc_strdup(boot_task,
 						opt->option->boot_args);
+		printf("FUNC %s : ABHISHEK in autoboot | INITRD :%s\n",__func__,  opt->option->boot_args);
 	} else {
 		boot_task->args = NULL;
 	}
+	printf("FUNC %s : ABHISHEK | FINAL BOOT ARGS :%s\n",__func__, boot_task->args);
 
 	if (cmd && cmd->console && !config->manual_console)
 		boot_task->boot_console = talloc_strdup(boot_task, cmd->console);
